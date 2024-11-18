@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head></head>
+<body>
+<canvas id='scene' height='500' width='500' style="border:1px solid #000000;"></canvas>
+</body>
+
+<script>
+var canvas = document.getElementById('scene') //make a reference to the canvas element
+var ctx = canvas.getContext('2d'); //make a reference to the area on the canvas where drawing takes place
+var flashColours = ['#ff0000', '#00ff00', '#ffff00', '#0000ff', '#00ffff'] //colours of the lights
+
+function randBetween(min, max) {return Math.floor(Math.random()*(max-min+1)+min);} //generates a random number...used for the lights.
+
+class flashingCircle { //flashing light class
+    constructor(x, y, r) {  //x position, y position, radius
+        this.x = x - r;
+        this.y  = y - r;
+        this.r = r
+        var milliseconds = randBetween(200,800)        
+        setInterval(this.flash.bind(this), milliseconds)
+    }
+
+    flash() {
+        ctx.fillStyle = flashColours[randBetween(0, flashColours.length-1)]
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+}
+
+
+
+function drawTree(tiers, width, height, x, y) {
+
+    var trunkHeight = height * 0.2
+    var trunkWidth = width * 0.15    
+    var overlap = height * 0.1    
+    var tierHeight = ((height-trunkHeight) / tiers) + overlap - (overlap/tiers);
+
+    for(var tier=1; tier<=tiers; tier++) {
+        tierWidth = (width / tiers) * tier        
+        ctx.fillStyle = '#00CC00';            
+        ctx.beginPath();    
+        ctx.moveTo((width/2)+x, y);
+    //code that draws the triangle for this tier:
+        ctx.lineTo((width/2)-(tierWidth/2)+x,y+tierHeight);
+        ctx.lineTo((width/2)+(tierWidth/2)+x,y+tierHeight);
+        ctx.lineTo((width/2)+x, y);    
+        ctx.fill();
+        y+=tierHeight - overlap        
+    }
+
+    //tree trunk    
+    ctx.beginPath();
+    ctx.fillStyle = '#663300';
+    ctx.fillRect((width/2)-(trunkWidth/2)+x, y+overlap,  trunkWidth, trunkHeight);
+
+}
+
+// Create gradient
+var grd = ctx.createRadialGradient(250, 250, 10, 250, 250, 250);
+grd.addColorStop(0, " #000033");
+grd.addColorStop(1, "#000080");
+// Fill with gradient
+ctx.fillStyle = grd;
+ctx.fillRect(0, 0, 500, 500);
+
+ctx.fillStyle = 'white';
+ctx.font = "bold 30px Arial";
+ctx.fillText("Hello World!", 10, 50);
+
+drawTree(5, 450, 450, 25, 25);
+
+var circles = []
+canvas.onmousedown = function(e) {
+    circles.push(new flashingCircle(e.x,e.y,8))
+}
+
+</script>
+</html>
